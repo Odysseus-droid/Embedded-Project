@@ -120,3 +120,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Firebase Configuration (used by the listener/publisher)
+FIREBASE_CONFIG = {
+    "apiKey": "YOUR_API_KEY",
+    "databaseURL": "https://analog-database-1ef55-default-rtdb.firebaseio.com/",
+}
