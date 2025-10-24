@@ -1,0 +1,17 @@
+{
+  "name": "Expressway Dashboard",
+  "short_name": "Expressway",
+  "description": "Smart Expressway Management System Dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "/Highway.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,65 +1,111 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+import { useState, useEffect } from "react"
+import { AlertCircle, TrendingUp, Zap, AlertTriangle } from "lucide-react"
+import RFIDStatusPanel from "@/components/rfid-status-panel"
+import TransactionLog from "@/components/transaction-log"
+import TopUpForm from "@/components/topup-form"
+import FloodControlPanel from "@/components/flood-control-panel"
+
+export default function Dashboard() {
+  const [emergencyStatus, setEmergencyStatus] = useState<"ACTIVE" | "INACTIVE">("INACTIVE")
+  // HARDCODED: Initial water level - Replace with Firebase real-time listener
+  const [waterLevel, setWaterLevel] = useState(45)
+  // HARDCODED: Simulated loading state - Remove when integrating with real backend
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // HARDCODED: Simulated loading delay - Remove when integrating with real backend
+    const timer = setTimeout(() => setIsLoading(false), 1000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-300">Loading Expressway Dashboard...</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">Expressway Toll System</h1>
+                <p className="text-sm text-slate-400">Real-time Monitoring & Control</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-slate-400">System Status</p>
+              <p className="text-lg font-semibold text-green-400">● Online</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Emergency Alert */}
+      {emergencyStatus === "ACTIVE" && (
+        <div className="bg-red-900/20 border-b border-red-500/30 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
+            <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-red-400">🚨 EMERGENCY OVERRIDE ACTIVE</p>
+              <p className="text-sm text-red-300">
+                All toll barriers are open due to critical flood warning. Vehicles are passing through without toll
+                deduction.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* RFID Status Panel */}
+          <div className="lg:col-span-2">
+            <RFIDStatusPanel />
+          </div>
+
+          {/* Flood Control Panel */}
+          <div>
+            <FloodControlPanel waterLevel={waterLevel} onEmergencyChange={setEmergencyStatus} />
+          </div>
+        </div>
+
+        {/* Top-Up Form and Transaction Log */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top-Up Form */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur-sm">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-orange-500" />
+              Balance Top-Up
+            </h2>
+            <TopUpForm />
+          </div>
+
+          {/* Transaction Log */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 backdrop-blur-sm">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-orange-500" />
+              Recent Transactions
+            </h2>
+            <TransactionLog />
+          </div>
         </div>
       </main>
     </div>
-  );
+  )
 }
