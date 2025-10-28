@@ -1,51 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Droplets } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface FloodControlPanelProps {
-  waterLevel: number
+  waterLevel?: number // optional, might be undefined while fetching
   onEmergencyChange: (status: "ACTIVE" | "INACTIVE") => void
 }
 
-function FloodControlPanel({ waterLevel, onEmergencyChange }: FloodControlPanelProps) {
-  const [level, setLevel] = useState(waterLevel)
+export default function FloodControlPanel({
+  waterLevel,
+  onEmergencyChange,
+}: FloodControlPanelProps) {
   const [isEmergency, setIsEmergency] = useState(false)
 
-  useEffect(() => {
-    // HARDCODED: Simulated water level changes - Replace with Firebase real-time listener
-    // TODO: Connect to Firebase to fetch actual flood sensor data from /flood_sensor node
-    const interval = setInterval(() => {
-      setLevel((prev) => {
-        const change = (Math.random() - 0.5) * 10
-        const newLevel = Math.max(0, Math.min(100, prev + change))
+  // Clamp waterLevel between 0 and 100 to prevent progress overflow
+  const safeWaterLevel = Math.min(Math.max(waterLevel ?? 0, 0), 100)
 
-        // HARDCODED: Emergency threshold at 80% - Verify this matches your system requirements
-        if (newLevel > 80 && !isEmergency) {
-          setIsEmergency(true)
-          onEmergencyChange("ACTIVE")
-        } else if (newLevel < 60 && isEmergency) {
-          setIsEmergency(false)
-          onEmergencyChange("INACTIVE")
-        }
-
-        return newLevel
-      })
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [isEmergency, onEmergencyChange])
-
+  // Status text color
   const getStatusColor = () => {
-    if (level > 80) return "text-red-500"
-    if (level > 60) return "text-yellow-500"
+    if (safeWaterLevel > 80) return "text-red-500"
+    if (safeWaterLevel > 60) return "text-yellow-500"
     return "text-green-500"
   }
 
+  // Progress bar color
   const getProgressColor = () => {
-    if (level > 80) return "bg-red-500"
-    if (level > 60) return "bg-yellow-500"
+    if (safeWaterLevel > 80) return "bg-red-500"
+    if (safeWaterLevel > 60) return "bg-yellow-500"
     return "bg-green-500"
   }
 
@@ -65,14 +48,20 @@ function FloodControlPanel({ waterLevel, onEmergencyChange }: FloodControlPanelP
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-slate-300">Water Level</p>
-            <p className={`text-2xl font-bold ${getStatusColor()}`}>{level.toFixed(1)}%</p>
+            {waterLevel === undefined ? (
+              <p className="text-2xl font-bold text-slate-400">Loading...</p>
+            ) : (
+              <p className={`text-2xl font-bold ${getStatusColor()}`}>
+                {safeWaterLevel.toFixed(1)}%
+              </p>
+            )}
           </div>
 
           {/* Progress Bar */}
           <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
             <div
               className={`h-full ${getProgressColor()} transition-all duration-500`}
-              style={{ width: `${level}%` }}
+              style={{ width: `${safeWaterLevel}%` }}
             />
           </div>
         </div>
@@ -80,11 +69,19 @@ function FloodControlPanel({ waterLevel, onEmergencyChange }: FloodControlPanelP
         {/* Status Indicator */}
         <div className="bg-slate-700/50 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <div className={`w-3 h-3 rounded-full ${isEmergency ? "bg-red-500 animate-pulse" : "bg-green-500"}`} />
-            <p className="text-sm font-semibold text-white">{isEmergency ? "EMERGENCY MODE" : "Normal Operation"}</p>
+            <div
+              className={`w-3 h-3 rounded-full ${
+                isEmergency ? "bg-red-500 animate-pulse" : "bg-green-500"
+              }`}
+            />
+            <p className="text-sm font-semibold text-white">
+              {isEmergency ? "EMERGENCY MODE" : "Normal Operation"}
+            </p>
           </div>
           <p className="text-xs text-slate-400">
-            {isEmergency ? "All toll barriers are open for emergency evacuation" : "System operating normally"}
+            {isEmergency
+              ? "All toll barriers are open for emergency evacuation"
+              : "System operating normally"}
           </p>
         </div>
 
@@ -104,7 +101,7 @@ function FloodControlPanel({ waterLevel, onEmergencyChange }: FloodControlPanelP
           </div>
         </div>
 
-        {/* Manual Override Button */}
+        {/* Manual Emergency Override Button */}
         {isEmergency && (
           <Button
             onClick={() => {
@@ -120,5 +117,3 @@ function FloodControlPanel({ waterLevel, onEmergencyChange }: FloodControlPanelP
     </div>
   )
 }
-
-export default FloodControlPanel;

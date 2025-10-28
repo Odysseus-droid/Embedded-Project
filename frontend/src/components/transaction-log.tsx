@@ -14,46 +14,7 @@ interface Transaction {
 }
 
 export default function TransactionLog() {
-  // HARDCODED: Mock transaction data - Replace with Firebase real-time listener
-  // TODO: Connect to Firebase to fetch actual transactions from /transactions node
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      id: "1",
-      rfidName: "John Doe",
-      carType: "PRIVATE",
-      timeIn: "14:32",
-      timeOut: "14:47",
-      tollFee: 8.5,
-      status: "COMPLETED",
-    },
-    {
-      id: "2",
-      rfidName: "Bus Line 1",
-      carType: "PUBLIC",
-      timeIn: "14:28",
-      timeOut: "14:43",
-      tollFee: 5.0,
-      status: "COMPLETED",
-    },
-    {
-      id: "3",
-      rfidName: "Ambulance 911",
-      carType: "EMERGENCY",
-      timeIn: "14:25",
-      timeOut: "14:31",
-      tollFee: 0.0,
-      status: "COMPLETED",
-    },
-    {
-      id: "4",
-      rfidName: "John Doe",
-      carType: "PRIVATE",
-      timeIn: "14:15",
-      timeOut: "-",
-      tollFee: 0.0,
-      status: "IN_PROGRESS",
-    },
-  ])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -71,7 +32,7 @@ export default function TransactionLog() {
   return (
     <div className="space-y-3 max-h-96 overflow-y-auto">
       {transactions.length === 0 ? (
-        <p className="text-slate-400 text-center py-8">No transactions yet</p>
+        <p className="text-slate-400 text-center py-8">Waiting for transaction data from Firebase...</p>
       ) : (
         transactions.map((tx) => (
           <div
@@ -90,7 +51,7 @@ export default function TransactionLog() {
               </div>
               <ArrowRight className="w-3 h-3" />
               <span>{tx.timeOut}</span>
-              <span className="text-green-400 font-semibold">${tx.tollFee.toFixed(2)}</span>
+              <span className="text-green-400 font-semibold">${(tx.tollFee ?? 0).toFixed(2)}</span>
             </div>
           </div>
         ))

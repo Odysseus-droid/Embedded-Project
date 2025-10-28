@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { AlertCircle, TrendingUp, Zap, AlertTriangle } from "lucide-react"
 import RFIDStatusPanel from "@/components/rfid-status-panel"
 import TransactionLog from "@/components/transaction-log"
@@ -9,27 +9,7 @@ import FloodControlPanel from "@/components/flood-control-panel"
 
 export default function Dashboard() {
   const [emergencyStatus, setEmergencyStatus] = useState<"ACTIVE" | "INACTIVE">("INACTIVE")
-  // HARDCODED: Initial water level - Replace with Firebase real-time listener
-  const [waterLevel, setWaterLevel] = useState(45)
-  // HARDCODED: Simulated loading state - Remove when integrating with real backend
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // HARDCODED: Simulated loading delay - Remove when integrating with real backend
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-300">Loading Expressway Dashboard...</p>
-        </div>
-      </div>
-    )
-  }
+  const [waterLevel, setWaterLevel] = useState(0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">

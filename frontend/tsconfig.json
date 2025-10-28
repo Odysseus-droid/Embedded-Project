@@ -26,7 +26,10 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ], // frontend
+      "@backend/*": [
+        "./backend/*"
+      ] // backend
     }
   },
   "include": [
@@ -34,6 +37,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
     ".next\\dev/types/**/*.ts",
     ".next\\dev/types/**/*.ts"
   ],

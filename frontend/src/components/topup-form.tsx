@@ -26,15 +26,13 @@ export default function TopUpForm() {
     setMessage("")
 
     try {
-      // HARDCODED: Django API endpoint - Update with your actual backend URL
-      // TODO: Replace "http://localhost:8000" with your production Django server URL
-      const response = await fetch("http://localhost:8000/api/rfids/topup/", {
-        method: "PUT",
+      const response = await fetch("http://localhost:8000/api/rfid-accounts/topup/", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          rfid_id: rfidId,
+          rfid_uid: rfidId, // <-- key must match backend
           amount: Number.parseFloat(amount),
         }),
       })
