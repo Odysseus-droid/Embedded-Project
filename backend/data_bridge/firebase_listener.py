@@ -1,89 +1,91 @@
-import firebase_admin
-from firebase_admin import db
+import os
 import threading
-import time
+from firebase_admin import db, credentials, initialize_app
+import firebase_admin
 
-# HARDCODED: Firebase configuration - same as publisher
-FIREBASE_CONFIG = {
-    'databaseURL': 'YOUR_DATABASE_URL'
-}
+# Load Firebase credentials and database URL from environment variables
+GOOGLE_CRED_PATH = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+FIREBASE_DATABASE_URL = os.environ.get('FIREBASE_DATABASE_URL')
 
 # Initialize Firebase
 try:
     firebase_admin.get_app()
 except ValueError:
-    firebase_admin.initialize_app(options={
-        'databaseURL': FIREBASE_CONFIG['databaseURL']
-    })
+    cred = credentials.Certificate(GOOGLE_CRED_PATH)
+    initialize_app(cred, options={'databaseURL': FIREBASE_DATABASE_URL})
 
 
 def listen_to_rfid_taps(callback):
-    """
-    Listen to RFID tap events from IoT devices
-    
-    Args:
-        callback: Function to call when new tap is detected
-    """
+    """Listen to RFID tap events"""
     ref = db.reference('rfid_taps')
-    
+
     def on_change(message):
-        print(f"[Firebase Listener] RFID Tap detected: {message.data}")
-        if callback:
-            callback(message.data)
-    
-    ref.listen(on_change)
+        try:
+            print(f"[Firebase Listener] RFID Tap detected: {message.data}")
+            if callback:
+                callback(message.data)
+        except Exception as e:
+            print(f"[RFID Listener] Error: {e}")
+
+    try:
+        ref.listen(on_change)
+    except Exception as e:
+        print(f"[RFID Listener] Listener failed: {e}")
 
 
 def listen_to_flood_sensor(callback):
-    """
-    Listen to flood sensor updates
-    
-    Args:
-        callback: Function to call when flood level changes
-    """
+    """Listen to flood sensor updates"""
     ref = db.reference('flood_sensor')
-    
+
     def on_change(message):
-        print(f"[Firebase Listener] Flood sensor update: {message.data}")
-        if callback:
-            callback(message.data)
-    
-    ref.listen(on_change)
+        try:
+            print(f"[Firebase Listener] Flood sensor update: {message.data}")
+            if callback:
+                callback(message.data)
+        except Exception as e:
+            print(f"[Flood Listener] Error: {e}")
+
+    try:
+        ref.listen(on_change)
+    except Exception as e:
+        print(f"[Flood Listener] Listener failed: {e}")
 
 
 def listen_to_servo_commands(callback):
-    """
-    Listen to servo gate commands
-    
-    Args:
-        callback: Function to call when servo command is received
-    """
+    """Listen to servo gate commands"""
     ref = db.reference('servo_commands')
-    
+
     def on_change(message):
-        print(f"[Firebase Listener] Servo command: {message.data}")
-        if callback:
-            callback(message.data)
-    
-    ref.listen(on_change)
+        try:
+            print(f"[Firebase Listener] Servo command: {message.data}")
+            if callback:
+                callback(message.data)
+        except Exception as e:
+            print(f"[Servo Listener] Error: {e}")
+
+    try:
+        ref.listen(on_change)
+    except Exception as e:
+        print(f"[Servo Listener] Listener failed: {e}")
 
 
 def start_listeners():
     """Start all Firebase listeners in background threads"""
-    
+
     def rfid_callback(data):
-        print(f"Processing RFID tap: {data}")
-        # HARDCODED: Add your RFID processing logic here
-        # Example: Call entry_gate or exit_gate API based on tap location
-    
+        print(f"[RFID Callback] Processing RFID tap: {data}")
+        # TODO: integrate with your entry_gate/exit_gate API
+
     def flood_callback(data):
-        print(f"Processing flood data: {data}")
-        # HARDCODED: Add your flood processing logic here
-        # Example: Trigger emergency override if water level exceeds threshold
-    
-    # Start listeners in separate threads
+        print(f"[Flood Callback] Processing flood data: {data}")
+        # TODO: trigger emergency override if threshold exceeded
+
+    def servo_callback(data):
+        print(f"[Servo Callback] Processing servo command: {data}")
+        # TODO: integrate with hardware API to move gate
+
     threading.Thread(target=listen_to_rfid_taps, args=(rfid_callback,), daemon=True).start()
     threading.Thread(target=listen_to_flood_sensor, args=(flood_callback,), daemon=True).start()
-    threading.Thread(target=listen_to_servo_commands, args=(None,), daemon=True).start()
-    
+    threading.Thread(target=listen_to_servo_commands, args=(servo_callback,), daemon=True).start()
+
     print("[Firebase] All listeners started")
