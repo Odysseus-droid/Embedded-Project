@@ -1,0 +1,24 @@
+////////// Copy-Paste Friendly Setup Commands //////////
+# Backend (Windows, PowerShell):
+py -m venv venv
+.\venv\Scripts\activate
+python.exe -m pip install --upgrade pip
+pip install -r requirements.txt
+
+py manage.py makemigrations
+py manage.py migrate
+py manage.py createsuperuser  # (optional, for admin access)
+
+-------- For running the Backend ---------
+# py manage.py runserver  # Use this for HTTP-only development
+
+daphne -b 0.0.0.0 -p 8000 core.asgi:application  # Use this for Channels/WebSockets
+
+daphne core.asgi:application # Use this for local development
+
+############ Frontend ############
+npm install --legacy-peer-deps
+npm run dev
+
+-----Save Dependencies to requirements------
+pip freeze > requirements.txt
